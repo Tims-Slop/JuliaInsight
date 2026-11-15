@@ -1,0 +1,80 @@
+<templateSet group="Julia">
+  <template name="fn" value="function $NAME$($ARGS$)&#10;    $END$&#10;end" description="function definition" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;f&quot;" alwaysStopAt="true"/>
+    <variable name="ARGS" expression="" defaultValue="&quot;&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="for" value="for $VAR$ in $ITER$&#10;    $END$&#10;end" description="for loop" toReformat="false" toShortenFQNames="false">
+    <variable name="VAR" expression="" defaultValue="&quot;i&quot;" alwaysStopAt="true"/>
+    <variable name="ITER" expression="" defaultValue="&quot;1:n&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="while" value="while $COND$&#10;    $END$&#10;end" description="while loop" toReformat="false" toShortenFQNames="false">
+    <variable name="COND" expression="" defaultValue="&quot;true&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="if" value="if $COND$&#10;    $END$&#10;end" description="if block" toReformat="false" toShortenFQNames="false">
+    <variable name="COND" expression="" defaultValue="&quot;&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="ife" value="if $COND$&#10;    $THEN$&#10;else&#10;    $END$&#10;end" description="if / else block" toReformat="false" toShortenFQNames="false">
+    <variable name="COND" expression="" defaultValue="&quot;&quot;" alwaysStopAt="true"/>
+    <variable name="THEN" expression="" defaultValue="&quot;&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="let" value="let $VARS$&#10;    $END$&#10;end" description="let block" toReformat="false" toShortenFQNames="false">
+    <variable name="VARS" expression="" defaultValue="&quot;&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="begin" value="begin&#10;    $END$&#10;end" description="begin block" toReformat="false" toShortenFQNames="false">
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="struct" value="struct $NAME$&#10;    $END$&#10;end" description="immutable struct" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;Name&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="mstruct" value="mutable struct $NAME$&#10;    $END$&#10;end" description="mutable struct" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;Name&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="kwstruct" value="Base.@kwdef struct $NAME$&#10;    $FIELD$::$TYPE$ = $DEFAULT$$END$&#10;end" description="Base.@kwdef struct with defaults" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;Name&quot;" alwaysStopAt="true"/>
+    <variable name="FIELD" expression="" defaultValue="&quot;x&quot;" alwaysStopAt="true"/>
+    <variable name="TYPE" expression="" defaultValue="&quot;Float64&quot;" alwaysStopAt="true"/>
+    <variable name="DEFAULT" expression="" defaultValue="&quot;0.0&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="abstract" value="abstract type $NAME$ end$END$" description="abstract type" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;AbstractName&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="module" value="module $NAME$&#10;&#10;$END$&#10;&#10;end # module $NAME$" description="module" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;MyModule&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="try" value="try&#10;    $BODY$&#10;catch $ERR$&#10;    $END$&#10;end" description="try / catch" toReformat="false" toShortenFQNames="false">
+    <variable name="BODY" expression="" defaultValue="&quot;&quot;" alwaysStopAt="true"/>
+    <variable name="ERR" expression="" defaultValue="&quot;e&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="macro" value="macro $NAME$($ARGS$)&#10;    return esc(quote&#10;        $END$&#10;    end)&#10;end" description="macro definition" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;name&quot;" alwaysStopAt="true"/>
+    <variable name="ARGS" expression="" defaultValue="&quot;ex&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="do" value="do $ARGS$&#10;    $END$&#10;end" description="do block" toReformat="false" toShortenFQNames="false">
+    <variable name="ARGS" expression="" defaultValue="&quot;x&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="doc" value="&quot;&quot;&quot;&#10;    $SIG$&#10;&#10;$END$&#10;&quot;&quot;&quot;" description="docstring" toReformat="false" toShortenFQNames="false">
+    <variable name="SIG" expression="" defaultValue="&quot;&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="testset" value="@testset &quot;$NAME$&quot; begin&#10;    @test $END$&#10;end" description="@testset block" toReformat="false" toShortenFQNames="false">
+    <variable name="NAME" expression="" defaultValue="&quot;&quot;" alwaysStopAt="true"/>
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+  <template name="main" value="if abspath(PROGRAM_FILE) == @__FILE__&#10;    $END$&#10;end" description="run only when executed as a script" toReformat="false" toShortenFQNames="false">
+    <context><option name="JULIA" value="true"/></context>
+  </template>
+</templateSet>

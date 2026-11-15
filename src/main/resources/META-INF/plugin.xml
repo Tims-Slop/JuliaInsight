@@ -1,0 +1,133 @@
+<idea-plugin>
+    <id>dev.juliainsight</id>
+    <name>Julia Insight</name>
+    <vendor>Julia Insight</vendor>
+
+    <description><![CDATA[
+    <p>Julia language support for PyCharm and other JetBrains IDEs, with natural math input.</p>
+    <ul>
+      <li><b>Accurate highlighting</b>: hand-written lexer that follows Julia's own rules (Unicode identifiers and operators,
+          string interpolation, string macros, nested comments, transpose vs. char literals, symbols vs. ranges), plus
+          semantic colouring of declarations, calls, types, parameters and docstrings.</li>
+      <li><b>Math notation</b>: <code>\theta</code> becomes <code>θ</code> while you type, <code>v_0</code> becomes
+          <code>v₀</code>, <code>\omega_0</code> becomes <code>ω₀</code>, <code>x\hat</code> becomes <code>x̂</code>.
+          Backspace restores what you typed, Tab completes like the Julia REPL, and the status bar shows how to type
+          the symbol at the caret.</li>
+      <li><b>Language server</b> (JetBrains' native LSP client): completion, hover docs, go to definition, find usages,
+          rename, diagnostics, formatting, signature help, inlay hints – with LanguageServer.jl (installed automatically)
+          or JETLS.jl.</li>
+      <li><b>REPL</b> in a real terminal, <b>Ctrl+Enter</b> sends the current block or selection, plots appear in the
+          <b>Julia Plots</b> tool window and variables in <b>Julia Workspace</b>.</li>
+      <li><b>Run configurations</b> with clickable stack traces, folding, structure view, breadcrumbs, smart
+          <code>end</code> insertion and indentation, live templates, TODOs.</li>
+    </ul>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.lsp</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- language core -->
+        <fileType name="Julia" implementationClass="dev.juliainsight.JuliaFileType" fieldName="INSTANCE"
+                  language="Julia" extensions="jl"/>
+        <lang.parserDefinition language="Julia" implementationClass="dev.juliainsight.psi.JuliaParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="Julia" implementationClass="dev.juliainsight.highlight.JuliaSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="dev.juliainsight.highlight.JuliaColorSettingsPage"/>
+        <annotator language="Julia" implementationClass="dev.juliainsight.highlight.JuliaHighlightingAnnotator"/>
+
+        <!-- editing -->
+        <lang.commenter language="Julia" implementationClass="dev.juliainsight.editor.JuliaCommenter"/>
+        <lang.braceMatcher language="Julia" implementationClass="dev.juliainsight.editor.JuliaBraceMatcher"/>
+        <lang.quoteHandler language="Julia" implementationClass="dev.juliainsight.editor.JuliaQuoteHandler"/>
+        <lang.foldingBuilder language="Julia" implementationClass="dev.juliainsight.editor.JuliaFoldingBuilder"/>
+        <lang.psiStructureViewFactory language="Julia" implementationClass="dev.juliainsight.editor.JuliaStructureViewFactory"/>
+        <breadcrumbsInfoProvider implementation="dev.juliainsight.editor.JuliaBreadcrumbsProvider"/>
+        <lineIndentProvider implementation="dev.juliainsight.editor.JuliaLineIndentProvider"/>
+        <typedHandler implementation="dev.juliainsight.editor.JuliaDedentTypedHandler"/>
+        <enterHandlerDelegate implementation="dev.juliainsight.editor.JuliaAutoEndEnterHandler"/>
+        <langCodeStyleSettingsProvider implementation="dev.juliainsight.editor.JuliaCodeStyleSettingsProvider"/>
+        <indexPatternBuilder implementation="dev.juliainsight.editor.JuliaIndexPatternBuilder"/>
+        <todoIndexer filetype="Julia" implementationClass="dev.juliainsight.editor.JuliaTodoIndexer"/>
+        <defaultLiveTemplates file="/liveTemplates/Julia.xml"/>
+        <liveTemplateContext contextId="JULIA" implementation="dev.juliainsight.editor.JuliaTemplateContextType"/>
+        <internalFileTemplate name="Julia File"/>
+        <internalFileTemplate name="Julia Module"/>
+
+        <!-- math / unicode input -->
+        <typedHandler implementation="dev.juliainsight.unicode.JuliaUnicodeTypedHandler" order="first"/>
+        <backspaceHandlerDelegate implementation="dev.juliainsight.unicode.JuliaUnicodeBackspaceHandler" order="first"/>
+        <enterHandlerDelegate implementation="dev.juliainsight.unicode.JuliaLatexEnterHandler" order="first"/>
+        <editorActionHandler action="EditorTab" implementationClass="dev.juliainsight.unicode.JuliaLatexTabHandler" order="first"/>
+        <completion.contributor language="Julia" implementationClass="dev.juliainsight.unicode.JuliaLatexCompletionContributor" order="first"/>
+        <completion.confidence language="Julia" implementationClass="dev.juliainsight.unicode.JuliaLatexCompletionConfidence" order="first"/>
+        <lookup.charFilter implementation="dev.juliainsight.unicode.JuliaLatexCharFilter" order="first"/>
+        <statusBarWidgetFactory id="JuliaInsightUnicodeSymbol" implementation="dev.juliainsight.unicode.JuliaUnicodeWidgetFactory"/>
+
+        <!-- settings -->
+        <projectConfigurable parentId="language" id="dev.juliainsight.settings" displayName="Julia"
+                             instance="dev.juliainsight.settings.JuliaConfigurable"/>
+
+        <!-- REPL, plots, workspace -->
+        <toolWindow id="Julia" anchor="bottom" icon="/icons/juliaRepl.svg" canCloseContents="false"
+                    factoryClass="dev.juliainsight.repl.JuliaReplToolWindowFactory"/>
+        <toolWindow id="Julia Plots" anchor="right" icon="/icons/juliaPlots.svg" canCloseContents="false"
+                    factoryClass="dev.juliainsight.repl.JuliaPlotsToolWindowFactory"/>
+        <toolWindow id="Julia Workspace" anchor="right" icon="/icons/juliaWorkspace.svg" canCloseContents="false"
+                    factoryClass="dev.juliainsight.repl.JuliaWorkspaceToolWindowFactory"/>
+        <actionPromoter implementation="dev.juliainsight.repl.JuliaReplActionPromoter"/>
+
+        <!-- running -->
+        <configurationType implementation="dev.juliainsight.run.JuliaRunConfigurationType"/>
+        <runConfigurationProducer implementation="dev.juliainsight.run.JuliaRunConfigurationProducer"/>
+
+        <notificationGroup id="Julia Insight" displayType="BALLOON"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij.platform.lsp">
+        <integrationProvider implementation="dev.juliainsight.lsp.JuliaLspIntegrationProvider"/>
+    </extensions>
+
+    <actions>
+        <action id="Julia.SendToRepl" class="dev.juliainsight.repl.JuliaSendToReplAction"
+                text="Send to Julia REPL" description="Run the selection or the current block in the Julia REPL"
+                icon="AllIcons.Actions.Execute">
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl ENTER"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift E"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta ENTER" replace-all="true"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="alt shift E"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta ENTER" replace-all="true"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
+        <action id="Julia.RunFileInRepl" class="dev.juliainsight.repl.JuliaRunFileInReplAction"
+                text="Run File in Julia REPL" description="include() this file in the Julia REPL" icon="AllIcons.Actions.RunAll">
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift ENTER"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta shift ENTER" replace-all="true"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta shift ENTER" replace-all="true"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="Julia.SendToRepl"/>
+            <add-to-group group-id="ProjectViewPopupMenuRunGroup" anchor="last"/>
+        </action>
+        <action id="Julia.ConvertLatex" class="dev.juliainsight.unicode.ConvertLatexToUnicodeAction"
+                text="Convert LaTeX to Unicode" description="Replace \name sequences (selection or whole file) with Unicode symbols">
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="Julia.RunFileInRepl"/>
+        </action>
+
+        <action id="Julia.NewFile" class="dev.juliainsight.editor.CreateJuliaFileAction" text="Julia File"
+                description="Create a new Julia file" icon="/icons/julia.svg">
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
+        </action>
+
+        <group id="Julia.ToolsMenu" text="Julia" popup="true" icon="/icons/julia.svg">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <action id="Julia.StartRepl" class="dev.juliainsight.repl.JuliaStartReplAction" text="Start Julia REPL" icon="AllIcons.Actions.Execute"/>
+            <action id="Julia.RestartRepl" class="dev.juliainsight.repl.JuliaRestartReplAction" text="Restart Julia REPL" icon="AllIcons.Actions.Restart"/>
+            <action id="Julia.InterruptRepl" class="dev.juliainsight.repl.JuliaInterruptReplAction" text="Interrupt Julia REPL"/>
+            <action id="Julia.CdToFileDir" class="dev.juliainsight.repl.JuliaCdToFileDirAction" text="Change REPL Directory to File's Folder"/>
+            <action id="Julia.RunTests" class="dev.juliainsight.repl.JuliaRunTestsInReplAction" text="Run Package Tests in REPL"/>
+            <separator/>
+            <action id="Julia.LspRestart" class="dev.juliainsight.lsp.RestartJuliaLanguageServerAction" text="Restart Language Server"/>
+            <action id="Julia.LspInstall" class="dev.juliainsight.lsp.InstallJuliaLanguageServerAction" text="Install / Repair Language Server"/>
+            <action id="Julia.LspUpdate" class="dev.juliainsight.lsp.UpdateJuliaLanguageServerAction" text="Update LanguageServer.jl"/>
+        </group>
+    </actions>
+</idea-plugin>
